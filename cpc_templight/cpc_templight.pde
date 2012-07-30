@@ -1,3 +1,12 @@
+// cpc-templight: a sketch for controlling an RGB LED via temperature.
+// Contains code from Oomlout's RGB LED Analogue and Temperature Sensor examples.
+// Written by Gareth Halfacree <gareth@halfacree.co.uk> for Custom PC Magazine Issue 110.
+
+// Customisation Options
+int upperTemp = 40 // Maximum (red) temperature in Celsius
+int lowerTemp = 10 // Minimum (blue) temperature in Celsius
+
+// Constants
 int ledAnalogOne[] = {3, 5, 6};
 int temperaturePin = 0;
 int heat = 0;
@@ -13,14 +22,14 @@ void setup(){
 void loop(){
   float temperature = getVoltage(temperaturePin);
   temperature = (temperature - .5) * 100;
-  heat = map(temperature, 10, 40, 0, 255);
-  cold = map(temperature, 40, 10, 0, 255);
-  byte tempColor[] = {heat, 0, cold};
-  setColor(ledAnalogOne, tempColor);
+  heat = map(temperature, lowerTemp, upperTemp, 0, 255);
+  cold = map(temperature, lowerTemp, upperTemp, 255, 0);
+  byte tempColour[] = {heat, 0, cold};
+  setColour(ledAnalogOne, tempColour);
   delay(1000);
 }
 
-void setColor(int* led, byte* color){
+void setColour(int* led, byte* color){
  for(int i = 0; i < 3; i++){
    analogWrite(led[i], 255 - color[i]); 
  }
