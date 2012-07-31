@@ -4,7 +4,7 @@
 
 // Customisation Options
 int upperTemp = 40; // Maximum (red) temperature in Celsius
-int lowerTemp = 10; // Minimum (blue) temperature in Celsius
+int lowerTemp = 20; // Minimum (blue) temperature in Celsius
 
 // Constants
 int ledAnalogOne[] = {3, 5, 6};
@@ -13,7 +13,6 @@ int heat = 0;
 int cold = 0;
 
 void setup(){
-  Serial.begin(9600);
   for(int i = 0; i < 3; i++){
    pinMode(ledAnalogOne[i], OUTPUT);
   }
@@ -32,6 +31,10 @@ float getVoltage(int pin){
 void loop(){
   float temperature = getVoltage(temperaturePin);
   temperature = (temperature - .5) * 100;
+  if (temperature < lowerTemp)
+    temperature = lowerTemp;
+  if (temperature > upperTemp)
+    temperature = upperTemp;
   heat = map(temperature, lowerTemp, upperTemp, 0, 255);
   cold = map(temperature, lowerTemp, upperTemp, 255, 0);
   byte tempColour[] = {heat, 0, cold};
