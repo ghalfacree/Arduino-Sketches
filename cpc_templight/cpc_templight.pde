@@ -18,9 +18,9 @@ void setup(){
   }
 }
 
-void setColour(int* led, byte* color){
+void setColour(int* led, byte* colour){
  for(int i = 0; i < 3; i++){
-   analogWrite(led[i], 255 - color[i]); 
+   analogWrite(led[i], 255 - colour[i]); 
  }
 }
 
