@@ -5,6 +5,7 @@
 // Customisation Options
 int upperTemp = 40; // Maximum (red) temperature in Celsius
 int lowerTemp = 20; // Minimum (blue) temperature in Celsius
+int changeTime = 1000; // Delay (in ms) between colour changes
 
 // Constants
 int ledAnalogOne[] = {3, 5, 6};
@@ -41,5 +42,5 @@ void loop(){
   cold = map(temperature, lowerTemp, upperTemp, 255, 0);
   byte tempColour[] = {heat, 0, cold};
   setColour(ledAnalogOne, tempColour);
-  delay(1000);
+  delay(changeTime);
 }
