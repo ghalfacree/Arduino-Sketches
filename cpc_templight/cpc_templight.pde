@@ -19,6 +19,7 @@ void setup(){
   for(int i = 0; i < 3; i++){
    pinMode(ledAnalogOne[i], OUTPUT);
   }
+  pinMode(temperaturePin, INPUT);
 }
 
 void setColour(int* led, byte* colour){
