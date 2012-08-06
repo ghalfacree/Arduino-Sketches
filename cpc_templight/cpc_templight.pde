@@ -9,6 +9,8 @@ int lowerTemp = 20; // Minimum (blue) temperature in Celsius
 // Constants
 int ledAnalogOne[] = {3, 5, 6};
 int temperaturePin = 0;
+
+// Initialisation
 int heat = 0;
 int cold = 0;
 
