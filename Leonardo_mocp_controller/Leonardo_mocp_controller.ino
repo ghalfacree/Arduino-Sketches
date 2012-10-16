@@ -37,7 +37,7 @@ void loop() {
     Keyboard.press(KEY_LEFT_CTRL);
     Keyboard.press(KEY_LEFT_ALT);
     Keyboard.press('p');
-    delay(150);
+    delay(250);
     Keyboard.releaseAll();
   }
   // save the current button state for comparison next time:
