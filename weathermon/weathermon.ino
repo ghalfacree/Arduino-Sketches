@@ -13,7 +13,6 @@ Adafruit_BMP085 bmp;
 
 dht DHT;
 #define DHT22_PIN A3
-float realtemp=0;
 
 void setup()
 {
@@ -45,8 +44,7 @@ void loop()
                 break;
   }
   
-  realtemp=((DHT.temperature)+(bmp.readTemperature()))/2;
-  Serial.print(realtemp, 1);
+  Serial.print(((DHT.temperature)+(bmp.readTemperature()))/2, 1);
   Serial.print(",");
   Serial.print(DHT.humidity, 1);
   Serial.print(",");
