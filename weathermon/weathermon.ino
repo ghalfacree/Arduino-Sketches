@@ -34,13 +34,13 @@ void loop()
     case DHTLIB_OK:  
                 break;
     case DHTLIB_ERROR_CHECKSUM:
-                Serial.print("Checksum error,\t");
+                Serial.print("Error: Bad Checksum");
                 break;
     case DHTLIB_ERROR_TIMEOUT:
-                Serial.print("Time out error,\t");
+                Serial.print("Error: Timeout");
                 break;
     default:
-                Serial.print("Unknown error,\t");
+                Serial.print("Error: Unknown Error");
                 break;
   }
   
