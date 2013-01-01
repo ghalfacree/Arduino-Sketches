@@ -5,19 +5,18 @@ Requires the DHT library: http://playground.arduino.cc/Main/DHTLib
 Requires the BMP085 library: https://github.com/adafruit/Adafruit-BMP085-Library
 */
 
-#include "dht.h"
 #include "Wire.h"
+#include "dht.h"
 #include "Adafruit_BMP085.h"
 
-Adafruit_BMP085 bmp;
-
+Adafruit_BMP085 BMP;
 dht DHT;
 #define DHT22_PIN A3
 
 void setup()
 {
   Serial.begin(9600);
-  bmp.begin();
+  BMP.begin();
   pinMode(DHT22_PIN, INPUT);
   digitalWrite(DHT22_PIN, HIGH);  
   Serial.println("Weather Monitor Data");
@@ -27,27 +26,10 @@ void setup()
 
 void loop()
 {
-
-  int chk = DHT.read22(DHT22_PIN);
-  switch (chk)
-  {
-    case DHTLIB_OK:  
-                break;
-    case DHTLIB_ERROR_CHECKSUM:
-                Serial.print("Error: Bad Checksum");
-                break;
-    case DHTLIB_ERROR_TIMEOUT:
-                Serial.print("Error: Timeout");
-                break;
-    default:
-                Serial.print("Error: Unknown Error");
-                break;
-  }
-  
-  Serial.print(((DHT.temperature)+(bmp.readTemperature()))/2, 1);
+  Serial.print(((DHT.temperature)+(BMP.readTemperature()))/2, 1);
   Serial.print(",");
   Serial.print(DHT.humidity, 1);
   Serial.print(",");
-  Serial.println(bmp.readPressure());
+  Serial.println(BMP.readPressure());
   delay(5000);
 }
