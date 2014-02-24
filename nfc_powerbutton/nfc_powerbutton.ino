@@ -18,19 +18,18 @@ void setup(void) {
   pinMode(8, OUTPUT);
   digitalWrite(8, LOW);
   Serial.begin(115200);
-  Serial.println("Hello!");
 
   nfc.begin();
 
   uint32_t versiondata = nfc.getFirmwareVersion();
   if (! versiondata) {
-    Serial.print("Didn't find PN53x board");
+    Serial.print("No PN53x NFC scanner detected; scanning disabled.");
     while (1); // halt
   }
   
   // Got ok data, print it out!
-  Serial.print("Found chip PN5"); Serial.print((versiondata>>24) & 0xFF, HEX);
-  Serial.print(" Firmware ver. "); Serial.print((versiondata>>16) & 0xFF, DEC); 
+  Serial.print("Found NFC scanner model PN5"); Serial.print((versiondata>>24) & 0xFF, HEX);
+  Serial.print(", firmware version "); Serial.print((versiondata>>16) & 0xFF, DEC); 
   Serial.print('.'); Serial.print((versiondata>>8) & 0xFF, DEC); Serial.println(".");
   
   // Set the max number of retry attempts to read from a card
@@ -41,14 +40,14 @@ void setup(void) {
   // configure board to read RFID tags
   nfc.SAMConfig();
     
-  Serial.println("Waiting for an ISO14443A card");
+  Serial.println("Waiting for NFC tag...");
 }
 
 void loop(void) {
   boolean success;
   boolean verified = false;
   uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
-  uint8_t storedUid[] = { 0x209, 0x166, 0x6, 0x183, 0, 0, 0};
+  uint8_t storedUid[] = { 0x209, 0x166, 0x6, 0x183, 0, 0, 0}; // The UID of the tag which can turn the PC on
   uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
   
   // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
@@ -57,6 +56,7 @@ void loop(void) {
   success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength);
   
   if (success) {
+    Serial.println("");
     Serial.print("NFC tag detected, UID:");
     for (uint8_t i=0; i < uidLength; i++) 
     {
@@ -74,7 +74,9 @@ void loop(void) {
       digitalWrite(8, LOW);}
     // Wait 1 second before continuing
     verified = false;
+    Serial.println("");
     delay(1000);
+    Serial.println("Waiting for NFC tag...");
   }
   else
   {
