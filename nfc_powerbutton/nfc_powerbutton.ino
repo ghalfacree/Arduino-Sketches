@@ -44,10 +44,10 @@ void setup(void) {
 }
 
 void loop(void) {
+  uint8_t storedUid[] = { 0x8, 0x251, 0x207, 0x195, 0, 0, 0 }; // The UID of the tag which can turn the PC on
   boolean success;
   boolean verified = false;
   uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
-  uint8_t storedUid[] = { 0x209, 0x166, 0x6, 0x183, 0, 0, 0}; // The UID of the tag which can turn the PC on
   uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
   
   // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
@@ -81,6 +81,6 @@ void loop(void) {
   else
   {
     // PN532 probably timed out waiting for a card
-    Serial.println("Timed out waiting for a card");
+    Serial.println("Timed out waiting for a card.");
   }
 }
