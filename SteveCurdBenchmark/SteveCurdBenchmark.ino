@@ -39,7 +39,7 @@ TM1638 module(8, 9, 7);
 
 void setup() {
  pinMode(13, OUTPUT);        // set the LED up to blink every 1000 iterations
- Serial.begin(57600);
+ Serial.begin(9600);
 }
 
 void loop() {
