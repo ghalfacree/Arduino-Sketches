@@ -78,11 +78,11 @@ void setup() {
 
   /* Initializations */
 
-  Serial.begin(115200); 
+  Serial.begin(9600); 
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  Serial.println("Dhrystone Benchmark, Version 2.1 (Language: C)");
+  Serial.println(F("Dhrystone Benchmark, Version 2.1 (Language: C)"));
 
   Next_Ptr_Glob = (Rec_Pointer)malloc (sizeof (Rec_Type));
   Ptr_Glob = (Rec_Pointer)malloc (sizeof (Rec_Type));
@@ -101,11 +101,11 @@ void setup() {
         /* Warning: With 16-Bit processors and Number_Of_Runs > 32000,  */
         /* overflow may occur for this array element.                   */
 
-  Number_Of_Runs = 300000;
+  Number_Of_Runs = 30000;
   
-  Serial.print("Execution starts, ");
+  Serial.print(F("Execution starts, "));
   Serial.print(Number_Of_Runs);
-  Serial.println(" runs through Dhrystone");
+  Serial.println(F(" runs through Dhrystone"));
   Serial.println();
   
   /***************/
@@ -164,8 +164,9 @@ void setup() {
   /**************/
 
   End_Time = micros();
+  User_Time = End_Time - Begin_Time;
 
-  Serial.println("Execution ends");
+  Serial.println(F("Execution ends"));
 /*
   printf ("\r\n");
   printf ("Final values of the variables used in the benchmark:\r\n");
@@ -218,12 +219,11 @@ void setup() {
   printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\r\n");
   printf ("\r\n");
 */
-  User_Time = End_Time - Begin_Time;
 
   if (User_Time < Too_Small_Time)
   {
-    Serial.println("Measured time too small to obtain meaningful results");
-    Serial.println("Please increase number of runs");
+    Serial.println(F("Measured time too small to obtain meaningful results"));
+    Serial.println(F("Please increase number of runs"));
     Serial.println();
   }
   else
@@ -231,7 +231,7 @@ void setup() {
     Microseconds = (double) User_Time / (double) Number_Of_Runs;
     Dhrystones_Per_Second = (double) Number_Of_Runs / ((double)User_Time/1000000.0);
     Vax_Mips = Dhrystones_Per_Second / 1757.0;
-  
+  }
 /*
 #ifdef ROPT
     printf ("Register option selected?  YES\r\n");
@@ -240,13 +240,13 @@ void setup() {
     strcpy(Reg_Define, "Register option not selected.");
 #endif
 */
-    Serial.print("Microseconds for one run through Dhrystone: ");
+    Serial.print(F("Microseconds for one run through Dhrystone: "));
     Serial.println(Microseconds);
-    Serial.print("Dhrystones per Second: ");
+    Serial.print(F("Dhrystones per Second: "));
     Serial.println(Dhrystones_Per_Second);
-    Serial.print("VAX MIPS rating = ");
+    Serial.print(F("VAX MIPS rating = "));
     Serial.println(Vax_Mips);
-  }
+  //}
 }
 
 void loop() {  
