@@ -1,4 +1,10 @@
 
+/* Dhrystone benchmark, modified for use with Arduinos and compatibles.
+ * Based on work by Ken Boak.
+ * Further modified to allow execution on an ATmega328-based board.
+ * Modified by Gareth Halfacree <gareth@halfacree.co.uk>
+ */
+
 /*
  *************************************************************************
  *
