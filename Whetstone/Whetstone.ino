@@ -46,9 +46,8 @@
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Starting Whetstone benchmark...");
-  pinMode(13, OUTPUT);
-  digitalWrite(13, HIGH);
+  while (!Serial) {}
+  Serial.println("Whetstone Benchmark, Version 1.2 (Language: C)");
 }
 
 
@@ -56,6 +55,8 @@ void setup() {
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+/* the following is optional depending on the timing function used */
+//#include <time.h>
 
 /* map the FORTRAN math functions, etc. to the C versions */
 #define DSIN    sin
@@ -411,11 +412,11 @@ C--------------------------------------------------------------------
 
     Serial.print("Loops: ");
     Serial.print(LOOP);
-    Serial.print("Iterations: ");
+    Serial.print(" Iterations: ");
     Serial.print(II);
-    Serial.print("Duration: ");
+    Serial.print(" Duration: ");
     Serial.print(finisec-startsec);
-    Serial.println(" millisec.");//Arduino measures time in milliseconds
+    Serial.println(" ms.");//Arduino measures time in milliseconds
 
 //    KIPS = (100.0*LOOP*II)/(float)(finisec-startsec);
       KIPS = (100.0*LOOP*II)/(float)(finisec-startsec)*1000;//convert to seconds from milliseconds
