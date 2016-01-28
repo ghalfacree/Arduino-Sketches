@@ -871,21 +871,21 @@ s   *
 
   /**
    * Set the CRC length
-   *
+   * <br>CRC checking cannot be disabled if auto-ack is enabled
    * @param length RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
    */
   void setCRCLength(rf24_crclength_e length);
 
   /**
    * Get the CRC length
-   *
+   * <br>CRC checking cannot be disabled if auto-ack is enabled
    * @return RF24_DISABLED if disabled or RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
    */
   rf24_crclength_e getCRCLength(void);
 
   /**
    * Disable CRC validation
-   *
+   * 
    * @warning CRC cannot be disabled if auto-ack/ESB is enabled.
    */
   void disableCRC( void ) ;
@@ -1331,6 +1331,14 @@ private:
  *
  * @section News News
  *
+ * **Dec 2015**<br>
+ * - ESP8266 support via Arduino IDE
+ * - <a href="https://github.com/stewarthou/Particle-RF24">Particle Photon/Core</a> fork available
+ * - ATTiny2313/4313 support added
+ * - Python 3 support added
+ * - RF24 added to Arduino library manager
+ * - RF24 added to PlatformIO library manager
+ *
  * **March 2015**<br>
  * - Uses SPI transactions on Arduino
  * - New layout for <a href="Portability.html">easier portability:</a> Break out defines & includes for individual platforms to RF24/utility
@@ -1339,12 +1347,6 @@ private:
  * - Support for RPi 2 added
  * - Major Documentation cleanup & update (Move all docs to github.io)
  *
- * <b>Dec 2014 </b><br>
- * - New: Intel Galileo now supported
- * - New: Python wrapper for RPi included
- * - Documentation updated
- * - Example files have been updated
- * - See the links below and class documentation for more info.
  *
  * If issues are discovered with the documentation, please report them <a href="https://github.com/TMRh20/tmrh20.github.io/issues"> here</a>
  *
@@ -1496,8 +1498,8 @@ private:
  *                                 +-\/-+
  *                   NC      PB5  1|o   |8  Vcc --- nRF24L01  VCC, pin2 --- LED --- 5V
  *    nRF24L01  CE, pin3 --- PB3  2|    |7  PB2 --- nRF24L01  SCK, pin5
- *    nRF24L01 CSN, pin4 --- PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin7
- *    nRF24L01 GND, pin1 --- GND  4|    |5  PB0 --- nRF24L01 MISO, pin6 
+ *    nRF24L01 CSN, pin4 --- PB4  3|    |6  PB1 --- nRF24L01 MOSI, pin6
+ *    nRF24L01 GND, pin1 --- GND  4|    |5  PB0 --- nRF24L01 MISO, pin7
  *                                 +----+ 
  * @endcode
  *
@@ -1531,10 +1533,27 @@ private:
  *                            PB3  4|    |11 PA2 --- nRF24L01   CE, pin3
  *                            PB2  5|    |10 PA3 --- nRF24L01  CSN, pin4
  *                            PA7  6|    |9  PA4 --- nRF24L01  SCK, pin5
- *    nRF24L01 MOSI, pin7 --- PA6  7|    |8  PA5 --- nRF24L01 MISO, pin6
+ *    nRF24L01 MISO, pin7 --- PA6  7|    |8  PA5 --- nRF24L01 MOSI, pin6
  *                                  +----+
  *	@endcode					 
  *	
+ * <br>
+ *    **ATtiny2313/4313 Pin map with CE_PIN 12 and CSN_PIN 13** <br>
+ * @code
+ *                                  +-\/-+                                                              
+ *                            PA2  1|o   |20 VCC --- nRF24L01  VCC, pin2
+ *                            PD0  2|    |19 PB7 --- nRF24L01  SCK, pin5
+ *                            PD1  3|    |18 PB6 --- nRF24L01 MOSI, pin6
+ *                            PA1  4|    |17 PB5 --- nRF24L01 MISO, pin7
+ *                            PA0  5|    |16 PB4 --- nRF24L01  CSN, pin4
+ *                            PD2  6|    |15 PB3 --- nRF24L01   CE, pin3
+ *                            PD3  7|    |14 PB2
+ *                            PD4  8|    |13 PB1
+ *                            PD5  9|    |12 PB0
+ *    nRF24L01  GND, pin1 --- GND 10|    |11 PD6
+ *                                  +----+
+ *	@endcode					 
+ *
  * <br><br><br>
  *
  *
@@ -1869,5 +1888,4 @@ private:
  */
 
 #endif // __RF24_H__
-
 
