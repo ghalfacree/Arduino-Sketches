@@ -412,9 +412,9 @@ C--------------------------------------------------------------------
 
     Serial.print("Loops: ");
     Serial.print(LOOP);
-    Serial.print(" Iterations: ");
+    Serial.print(", Iterations: ");
     Serial.print(II);
-    Serial.print(" Duration: ");
+    Serial.print(", Duration: ");
     Serial.print(finisec-startsec);
     Serial.println(" ms.");//Arduino measures time in milliseconds
 
