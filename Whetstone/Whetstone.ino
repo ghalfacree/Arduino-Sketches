@@ -56,8 +56,6 @@ void setup() {
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-/* the following is optional depending on the timing function used */
-//#include <time.h>
 
 /* map the FORTRAN math functions, etc. to the C versions */
 #define DSIN    sin
