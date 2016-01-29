@@ -77,7 +77,7 @@ void PA(float E[]);
 void P0(void);
 void P3(float X, float Y, float *Z);
 #define USAGE   "usage: whetdc [-c] [loops]\n"
-#define PRINTOUT
+//#define PRINTOUT
 
 /*
     COMMON T,T1,T2,E1(4),J,K,L
