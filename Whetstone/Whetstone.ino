@@ -2,11 +2,15 @@
  *  Based on the work of Thomas Kirchner, modified to work
  *  with the Arduino IDE 1.6.x series.
  *  Modified by Gareth Halfacree <gareth@halfacree.co.uk>
+ *  Further modified to use single-precision floats, instead of
+ *  double-precision doubles, for fairer comparison between
+ *  AVR (where doubles and floats are both 32-bit) and other
+ *  platforms.
  */
 
 /* Source: http://www.netlib.org/benchmark/whetstonec
  *
- * C Converted Whetstone Double Precision Benchmark
+ * C Converted Whetstone float Precision Benchmark
  *      Version 1.2 22 March 1998
  *
  *  (c) Copyright 1998 Painter Engineering, Inc.
@@ -59,26 +63,26 @@ void setup() {
 //#include <time.h>
 
 /* map the FORTRAN math functions, etc. to the C versions */
-#define DSIN    sin
-#define DCOS    cos
-#define DATAN   atan
-#define DLOG    log
-#define DEXP    exp
-#define DSQRT   sqrt
+#define DSIN    sinf
+#define DCOS    cosf
+#define DATAN   atanf
+#define DLOG    logf
+#define DEXP    expf
+#define DSQRT   sqrtf
 #define IF      if
 
 /* function prototypes */
-void POUT(long N, long J, long K, double X1, double X2, double X3, double X4);
-void PA(double E[]);
+void POUT(long N, long J, long K, float X1, float X2, float X3, float X4);
+void PA(float E[]);
 void P0(void);
-void P3(double X, double Y, double *Z);
+void P3(float X, float Y, float *Z);
 #define USAGE   "usage: whetdc [-c] [loops]\n"
 #define PRINTOUT
 
 /*
     COMMON T,T1,T2,E1(4),J,K,L
 */
-double T,T1,T2,E1[5];
+float T,T1,T2,E1[5];
 int J,K,L;
 
 int argc=0;//Mod for nucleo. Change in code below if you want non-default loop count
@@ -86,7 +90,7 @@ int argc=0;//Mod for nucleo. Change in code below if you want non-default loop c
 
 
 void
-PA(double E[])
+PA(float E[])
 {
     J = 0;
 
@@ -110,9 +114,9 @@ P0(void)
 }
 
 void
-P3(double X, double Y, double *Z)
+P3(float X, float Y, float *Z)
 {
-    double X1, Y1;
+    float X1, Y1;
 
     X1 = X;
     Y1 = Y;
@@ -123,7 +127,7 @@ P3(double X, double Y, double *Z)
 
 #ifdef PRINTOUT
 void
-POUT(long N, long J, long K, double X1, double X2, double X3, double X4)
+POUT(long N, long J, long K, float X1, float X2, float X3, float X4)
 {
    /*sprintf("%7ld %7ld %7ld %12.4e %12.4e %12.4e %12.4e\n",
                         N, J, K, X1, X2, X3, X4);*/
@@ -137,7 +141,7 @@ whetstone(int argc)
     /* used in the FORTRAN version */
     long I;
     long N1, N2, N3, N4, N6, N7, N8, N9, N10, N11;
-    double X1,X2,X3,X4,X,Y,Z;
+    float X1,X2,X3,X4,X,Y,Z;
     long LOOP;
     int II, JJ;
 
@@ -421,12 +425,12 @@ C--------------------------------------------------------------------
 //    KIPS = (100.0*LOOP*II)/(float)(finisec-startsec);
       KIPS = (100.0*LOOP*II)/(float)(finisec-startsec)*1000;//convert to seconds from milliseconds
     if (KIPS >= 1000.0){
-        Serial.print("C Converted Double Precision Whetstones: ");
+        Serial.print("C Converted Single Precision Whetstones: ");
         Serial.print(KIPS/1000.0);
         Serial.println(" MIPS");
     }
     else{
-        Serial.print("C Converted Double Precision Whetstones: ");
+        Serial.print("C Converted Single Precision Whetstones: ");
         Serial.print(KIPS);
         Serial.println(" KIPS");
     }
