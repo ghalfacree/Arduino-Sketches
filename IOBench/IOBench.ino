@@ -31,8 +31,10 @@
  *  most common methods of controlling pins.
  */
 
-char versionNumber[ ]= "v1.1.0";
-unsigned long numberOfIterations = 100000; // Increase if the benchmarks complete too quickly
+char versionNumber[ ] = "v1.1.1";
+unsigned long numberOfIterations = 1000000; // Increase if the benchmarks complete too quickly
+int writePin = 7; // Pin to use for write benchmarks
+int readPin = 8; // Pin to use for read benchmarks
 unsigned long timeBegan;
 unsigned long loopTimeElapsed;
 double timeElapsed;
@@ -40,8 +42,8 @@ int readResult;
 unsigned long i = 0;
 
 void setup() {
-  pinMode(7, OUTPUT);
-  pinMode(8, INPUT);
+  pinMode(writePin, OUTPUT);
+  pinMode(readPin, INPUT);
   Serial.begin(9600);
   Serial.println(F(""));
   Serial.print(F("IOBench for Arduino, "));
@@ -61,11 +63,13 @@ void loop() {
   Serial.print(loopTimeElapsed);
   Serial.println(F(" microseconds."));
   Serial.println(F(""));
-  Serial.println(F("Beginning read benchmark on Pin 8..."));
+  Serial.print(F("Beginning read benchmark on Pin "));
+  Serial.print(readPin);
+  Serial.println(F("..."));
   i = 0;
   timeBegan = micros();
   while(i < numberOfIterations) {
-    readResult=digitalRead(8);
+    readResult=digitalRead(readPin);
     i++;
   }
   timeElapsed = (micros()-timeBegan-loopTimeElapsed); // Time taken to read a pin then increment a variable
@@ -73,11 +77,13 @@ void loop() {
   Serial.print((numberOfIterations/timeElapsed)*1000);
   Serial.println(F(" kHz."));
   Serial.println(F(""));
-  Serial.println(F("Beginning soft write benchmark on Pin 7..."));
+  Serial.print(F("Beginning soft write benchmark on Pin "));
+  Serial.print(writePin);
+  Serial.println(F("..."));
   i = 0;
   timeBegan = micros();
   while(i < numberOfIterations) {
-    digitalWrite(7, HIGH);
+    digitalWrite(writePin, HIGH);
     i++;
   }
   timeElapsed = (micros()-timeBegan-loopTimeElapsed);
@@ -85,12 +91,14 @@ void loop() {
   Serial.print((numberOfIterations/timeElapsed)*1000);
   Serial.println(F(" kHz."));
   Serial.println(F(""));
-  Serial.println(F("Beginning hard write benchmark on Pin 7..."));
+  Serial.print(F("Beginning hard write benchmark on Pin "));
+  Serial.print(writePin);
+  Serial.println(F("..."));
   Serial.println(F("Activate frequency counter now."));
   Serial.println(F("NOTE: Double the reported frequency for per-digitalWrite result."));
   Serial.println(F("Reset Arduino to restart benchmarks."));
   while(1) { // Infinite loop; use a frequency counter to get a measurement of write performance
-    digitalWrite(7, HIGH);
-    digitalWrite(7, LOW); 
+    digitalWrite(writePin, HIGH);
+    digitalWrite(writePin, LOW); 
   }
 }
