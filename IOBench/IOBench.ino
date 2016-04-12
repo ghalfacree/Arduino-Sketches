@@ -6,7 +6,7 @@
  *  compatible devices.
  *  
  *  The read benchmark begins by measuring the time, in
- *  microseconds, it takes to complete a 100,000-strong loop.
+ *  microseconds, it takes to complete a large loop.
  *  The loop is then repeated with a digitalRead operation,
  *  and the elapsed time in microseconds minus the time taken
  *  by the incrementing of the variable is printed to the
@@ -31,7 +31,7 @@
  *  most common methods of controlling pins.
  */
 
-char versionNumber[ ] = "v1.1.1";
+char versionNumber[ ] = "v1.1.2";
 unsigned long numberOfIterations = 1000000; // Increase if the benchmarks complete too quickly
 int writePin = 7; // Pin to use for write benchmarks
 int readPin = 8; // Pin to use for read benchmarks
