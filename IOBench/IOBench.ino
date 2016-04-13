@@ -32,7 +32,7 @@
  *  most common methods of controlling pins.
  */
 
-char versionNumber[ ] = "v1.1.2";
+char versionNumber[ ] = "v1.1.3";
 unsigned long numberOfIterations = 1000000; // Increase if the benchmarks complete too quickly
 int writePin = 7; // Pin to use for write benchmarks
 int readPin = 8; // Pin to use for read benchmarks
