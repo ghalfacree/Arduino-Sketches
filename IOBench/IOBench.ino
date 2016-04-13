@@ -74,7 +74,7 @@ void loop() {
     readResult=digitalRead(readPin);
     i++;
   }
-  timeElapsed = (micros()-timeBegan-loopTimeElapsed); // Time taken to read a pin then increment a variable
+  timeElapsed = (micros()-timeBegan-loopTimeElapsed); // Time taken to read a pin
   Serial.print(F("Read performance: "));
   Serial.print((numberOfIterations/timeElapsed)*1000);
   Serial.println(F(" kHz."));
@@ -88,7 +88,7 @@ void loop() {
     digitalWrite(writePin, HIGH);
     i++;
   }
-  timeElapsed = (micros()-timeBegan-loopTimeElapsed);
+  timeElapsed = (micros()-timeBegan-loopTimeElapsed); // Time taken to write a pin
   Serial.print(F("Write performance: "));
   Serial.print((numberOfIterations/timeElapsed)*1000);
   Serial.println(F(" kHz."));
