@@ -19,9 +19,10 @@
  *  benchmark loops forever and requires a frequency counter or
  *  oscilloscope connected to Pin 7 to measure the performance.
  *  The hard benchmark performs two digitalWrites, one high
- *  and one low, to toggle the pin; as a result, you'll need to
- *  double the figure you read on the frequency counter to
- *  get a per-write performance reading.
+ *  and one low, to toggle the pin; this will give a different
+ *  result than the single-write soft benchmark. When comparing
+ *  boards, always compare soft-to-soft and hard-to-hard; never
+ *  compare soft-to-hard or vice-versa.
  *  
  *  NOTE: IOBench is not about getting the best performance out
  *  of a given microcontroller; there are much more efficient
@@ -44,6 +45,7 @@ unsigned long i = 0;
 void setup() {
   pinMode(writePin, OUTPUT);
   pinMode(readPin, INPUT);
+  delay(5000); // Gives us time to active the serial monitor
   Serial.begin(9600);
   Serial.println(F(""));
   Serial.print(F("IOBench for Arduino, "));
@@ -91,11 +93,10 @@ void loop() {
   Serial.print((numberOfIterations/timeElapsed)*1000);
   Serial.println(F(" kHz."));
   Serial.println(F(""));
-  Serial.print(F("Beginning hard write benchmark on Pin "));
+  Serial.print(F("Beginning hard (toggle) write benchmark on Pin "));
   Serial.print(writePin);
   Serial.println(F("..."));
   Serial.println(F("Activate frequency counter now."));
-  Serial.println(F("NOTE: Double the reported frequency for per-digitalWrite result."));
   Serial.println(F("Reset Arduino to restart benchmarks."));
   while(1) { // Infinite loop; use a frequency counter to get a measurement of write performance
     digitalWrite(writePin, HIGH);
