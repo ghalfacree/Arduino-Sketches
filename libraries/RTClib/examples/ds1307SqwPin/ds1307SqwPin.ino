@@ -14,7 +14,8 @@
 #include <Wire.h>
 #include "RTClib.h"
 
-#if defined(ARDUINO_ARCH_SAMD)  // for Zero, output on USB Serial console
+#if defined(ARDUINO_ARCH_SAMD)
+// for Zero, output on USB Serial console, remove line below if using programming port to program the Zero!
    #define Serial SerialUSB
 #endif
 
@@ -41,7 +42,10 @@ void print_mode() {
 }
 
 void setup () {
-  while (!Serial);  // for Leonardo/Micro/Zero
+
+#ifndef ESP8266
+  while (!Serial); // for Leonardo/Micro/Zero
+#endif
 
   Serial.begin(57600);
   if (! rtc.begin()) {
