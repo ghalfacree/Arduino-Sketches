@@ -1,42 +1,47 @@
-void loadeeprom(){
+void cleaneeprom(int i) {
+  printBottomHeader(F("Cleaning EEPROM"));
+  gb.display.update();
+  for (; i < 1024; i++) {
+    if (EEPROM.read(i))
+      EEPROM.write(i, 0);
+  }
+}
+void loadeeprom() {
   strcpy(completeName, nextGameName);
-  for(byte i=0; i<8; i++){
-    if(completeName[i] == ' ')
+  for (byte i = 0; i < 8; i++) {
+    if (completeName[i] == ' ')
       completeName[i] = '\0';
   }
   strcat(completeName, ".SAV");
-  res=file.openFile(completeName, FILEMODE_TEXT_READ);
-  if (res==NO_ERROR)
+  int i = 0;
+  if (file.open(completeName, O_READ))
   {
-    gb.display.print("Loading saved game\n");
-    gb.display.println(completeName);
+    printBottomHeader(F("Loading saved game"));
     gb.display.update();
     word result=0;
-    byte i = 0;
-    while ((result!=EOF) and (result!=FILE_IS_EMPTY))
-    {
-      result=file.readLn(buffer, BUFFER_SIZE+2);
-      if (result!=FILE_IS_EMPTY)
+    int k = 0;
+    do {
+      k = file.read(buffer, BUFFER_SIZE);
+      if (k > 0)
       {
-        for(byte j=0; j<BUFFER_SIZE; j+=2){
-          EEPROM.write((i*BUFFER_SIZE+j)/2,(buffer[j] & 0xF0) | (buffer[j+1] & 0x0F));
+        for(byte j = 0; j<k; j++){
+          if(EEPROM.read(i)!=buffer[j]){
+            EEPROM.write(i,buffer[j]);
+          }
+          i++;
+          if (i >= 1024) {
+            break;
+          }
         }
-        i++;
       }
-      else{
-        gb.display.println(F("File empty"));
-        gb.display.update();
+      else if (i == 0) {
+        printBottomHeader(F("File empty"));
       }
-    }
-    file.closeFile();
+    } while (k > 0);
+    file.close();
   }
   else{
-    gb.display.println(F("No saved game"));
-    gb.display.println(F("Cleaning EEPROM"));
-    gb.display.update();
-    for (int i = 0; i < 1024; i++){
-      if(EEPROM.read(i))
-        EEPROM.write(i, 0);
-    }
+    printBottomHeader(F("No saved game"));
   }
+  cleaneeprom(i); // if the file is empty or non-existing this'll also get run, i will be 0 --> win
 }

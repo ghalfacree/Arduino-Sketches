@@ -1,8 +1,20 @@
-/* 
- * File:   Gamebuino.h
- * Author: Rodot
+/*
+ * (C) Copyright 2014 Aurélien Rodot. All rights reserved.
  *
- * Created on October 1, 2013, 5:39 PM
+ * This file is part of the Gamebuino Library (http://gamebuino.com)
+ *
+ * The Gamebuino Library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 #ifndef GAMEBUINO_H
@@ -11,15 +23,17 @@
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include <avr/sleep.h>
-#include "settings.c"
-#include "Backlight.h"
-#include "Display.h"
-#include "Buttons.h"
-#include "Battery.h"
-#include "Sound.h"
+#include "utility/settings.c"
+#include "utility/Backlight.h"
+#include "utility/Display.h"
+#include "utility/Buttons.h"
+#include "utility/Battery.h"
+#include "utility/Sound.h"
 
 #define load_game (*((void(*)(const char* filename))(0x7ffc/2)))
 #define write_flash_page (*((void(*)(const char * page, unsigned char * buffer))(0x7ffa/2)))
+
+#define wrap(i, imax) ((imax+i)%(imax))
 
 class Gamebuino {
 public:
@@ -56,7 +70,9 @@ public:
 	
 	boolean collidePointRect(int16_t x1, int16_t y1 ,int16_t x2 ,int16_t y2, int16_t w, int16_t h);
 	boolean collideRectRect(int16_t x1, int16_t y1, int16_t w1, int16_t h1 ,int16_t x2 ,int16_t y2, int16_t w2, int16_t h2);
-    
+    boolean collideBitmapBitmap(int16_t x1, int16_t y1, const uint8_t* b1, int16_t x2, int16_t y2, const uint8_t* b2);
+
+	
 private:
     uint8_t timePerFrame;
     uint32_t nextFrameMillis;

@@ -1,12 +1,27 @@
-/* 
-* File:   Gamebuino.cpp
-* Author: Rodot
-* 
-* Created on October 1, 2013, 5:39 PM
-*/
+/*
+ * (C) Copyright 2014 Aurélien Rodot. All rights reserved.
+ *
+ * This file is part of the Gamebuino Library (http://gamebuino.com)
+ *
+ * The Gamebuino Library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
 
 #include "Gamebuino.h"
 const uint16_t startupSound[] PROGMEM = {0x0005,0x3089,0x208,0x238,0x7849,0x1468,0x0000};
+
+// a 3x5 font table
+extern const uint8_t font3x5[] PROGMEM;
 
 const uint8_t gamebuinoLogo[] PROGMEM =
 {
@@ -40,8 +55,9 @@ void Gamebuino::begin() {
 	display.begin(SCR_CLK, SCR_DIN, SCR_DC, SCR_CS, SCR_RST);
 	sound.begin();
 	
-	//mute when B is held during start up
-	if(buttons.pressed(BTN_B)){
+	//mute when B is held during start up or if battery is low
+	battery.update();
+	if(buttons.pressed(BTN_B) || (battery.level == 0)){
 		sound.setVolume(0);
 	}
 	else{ //play the startup sound on each channel for it to be louder
@@ -122,7 +138,7 @@ void Gamebuino::titleScreen(const __FlashStringHelper*  name, const uint8_t *log
 				
 				//toggle volume when B is pressed
 				if(buttons.pressed(BTN_B)){
-					sound.setVolume(sound.globalVolume+1);
+					sound.setVolume(sound.getVolume() + 1);
 					sound.playTick();
 				}
 				//leave the menu
@@ -157,6 +173,22 @@ boolean Gamebuino::update() {
 
 	} else {
 		if (!frameEndMicros) { //runs once at the end of the frame
+		
+			//increase volume shortcut : hold C + press B
+			if(buttons.repeat(BTN_C, 1) && buttons.pressed(BTN_B)){
+				sound.setVolume(sound.getVolume() + 1);
+				popup(F("\027+\026 \23\24"), 60);
+				sound.playTick();
+			}
+			
+			//flash loader shortcut : hold C + A
+			if(buttons.repeat(BTN_C, 1) && buttons.pressed(BTN_A)){
+				popup(F("\027+\025 \020 LOADER"), 60);
+			}
+			if(buttons.repeat(BTN_C, 1) && buttons.held(BTN_A,40)){
+				changeGame();
+			}
+		
 			sound.updateTrack();
 			sound.updatePattern();
 			sound.updateNote();
@@ -191,10 +223,11 @@ boolean Gamebuino::update() {
 void Gamebuino::setFrameRate(uint8_t fps) {
 	timePerFrame = 1000 / fps;
 	sound.prescaler = fps / 20;
+	sound.prescaler = max(1, sound.prescaler);
 }
 
 void Gamebuino::pickRandomSeed(){
-	randomSeed(battery.voltage * ~micros() + backlight.ambientLight + micros());
+	randomSeed(~battery.voltage * ~micros() * ~micros() + backlight.ambientLight + micros());
 }
 
 uint8_t Gamebuino::getCpuLoad(){
@@ -434,21 +467,40 @@ void Gamebuino::updatePopup(){
 
 void Gamebuino::displayBattery(){
 #if (ENABLE_BATTERY > 0)
+	if(battery.thresholds[0] == 0) return;
 	display.setColor(BLACK, WHITE);
 	display.cursorX = LCDWIDTH-display.fontWidth+1;
 	display.cursorY = 0;
+	byte count = 168;
 	switch(battery.level){
 	case 0://battery critic, power down
 		sound.stopPattern();
-		backlight.set(0);
-		display.clear();
 		display.fontSize = 1;
-		display.print(F("NO BATTERY\n\nPLEASE\nTURN OFF"));
-		display.update();
-		set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-		sleep_enable();
-		sleep_mode();
-		sleep_disable();
+		display.setFont(font3x5);
+		battery.thresholds[0] = 0; //disable the battery monitoring to avoid infinite recursive loop
+		display.persistence = false;
+		while(1){
+			if(update()){
+				display.print(F("LOW BATTERY! "));
+				display.print(battery.voltage);
+				display.print(F("mV\n\nPLEASE TURN OFF "));
+				display.print(count/16);
+				display.print(F("\n\n\25:Ignore"));
+				if(buttons.pressed(BTN_A)){
+					//ignore the message and disable the battery monitoring
+					break;
+				}
+				count--;
+				if(count == 0){
+					//put the Gamebuino to sleep if no action is taken
+					backlight.set(0);
+					set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+					sleep_enable();
+					sleep_mode();
+					sleep_disable();	
+				}
+			}
+		}
 		break;
 	case 1: //empty battery
 		if((frameCount % 16) < 8) display.print('\7'); //blinking battery
@@ -503,15 +555,17 @@ void Gamebuino::readSettings(){
 		backlight.ambientLightMin = pgm_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MIN);
 		backlight.ambientLightMax = pgm_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MAX);
 		
-		sound.volumeMax = pgm_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_MAX);
+		//sound.volumeMax = pgm_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_MAX);
+		sound.volumeMax = VOLUME_GLOBAL_MAX; //max volume is no longer read from settings
+		
 		sound.globalVolume = pgm_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_DEFAULT);
 
 		startMenuTimer = pgm_read_byte(SETTINGS_PAGE+OFFSET_START_MENU_TIMER);
 		
-		battery.thresolds[0] = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_CRITIC);
-		battery.thresolds[1] = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_LOW);
-		battery.thresolds[2] = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_MED);
-		battery.thresolds[3] = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_FULL);
+		battery.thresholds[0] = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_CRITIC);
+		battery.thresholds[1] = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_LOW);
+		battery.thresholds[2] = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_MED);
+		battery.thresholds[3] = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_FULL);
 	}
 	else{
 		display.contrast = SCR_CONTRAST;
@@ -525,10 +579,10 @@ void Gamebuino::readSettings(){
 		
 		startMenuTimer = START_MENU_TIMER;
 		
-		battery.thresolds[0] = BAT_LVL_CRITIC;
-		battery.thresolds[1] = BAT_LVL_LOW;
-		battery.thresolds[2] = BAT_LVL_MED;
-		battery.thresolds[3] = BAT_LVL_FULL;
+		battery.thresholds[0] = BAT_LVL_CRITIC;
+		battery.thresholds[1] = BAT_LVL_LOW;
+		battery.thresholds[2] = BAT_LVL_MED;
+		battery.thresholds[3] = BAT_LVL_FULL;
 	}
 }
 
@@ -548,8 +602,32 @@ boolean Gamebuino::collidePointRect(int16_t x1, int16_t y1 ,int16_t x2 ,int16_t 
 }
 
 boolean Gamebuino::collideRectRect(int16_t x1, int16_t y1, int16_t w1, int16_t h1 ,int16_t x2 ,int16_t y2, int16_t w2, int16_t h2){
-  return !( x2     >  x1+w1  || 
-            x2+w2  <  x1     || 
-            y2     >  y1+h1  ||
-            y2+h2  <  y1     );
+  return !( x2     >=  x1+w1  || 
+            x2+w2  <=  x1     || 
+            y2     >=  y1+h1  ||
+            y2+h2  <=  y1     );
+}
+
+boolean Gamebuino::collideBitmapBitmap(int16_t x1, int16_t y1, const uint8_t* b1, int16_t x2, int16_t y2, const uint8_t* b2){
+  int16_t w1 = pgm_read_byte(b1);
+  int16_t h1 = pgm_read_byte(b1 + 1);
+  int16_t w2 = pgm_read_byte(b2);
+  int16_t h2 = pgm_read_byte(b2 + 1);
+
+  if(collideRectRect(x1, y1, w1, h1, x2, y2, w2, h2) == false){
+    return false;
+  }
+  
+  int16_t xmin = (x1>=x2)? 0 : x2-x1;
+  int16_t ymin = (y1>=y2)? 0 : y2-y1;
+  int16_t xmax = (x1+w1>=x2+w2)? x2+w2-x1 : w1;
+  int16_t ymax = (y1+h1>=y2+h2)? y2+h2-y1 : h1;
+  for(uint8_t y = ymin; y < ymax; y++){
+    for(uint8_t x = xmin; x < xmax; x++){
+      if(display.getBitmapPixel(b1, x, y) && display.getBitmapPixel(b2, x1+x-x2, y1+y-y2)){
+        return true;
+      }
+    }
+  }
+  return false;
 }
