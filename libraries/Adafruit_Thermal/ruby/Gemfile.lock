@@ -1,7 +1,9 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    rmagick (2.13.1)
+    pkg-config (1.5.5)
+    rmagick (5.3.0)
+      pkg-config (~> 1.4)
 
 PLATFORMS
   ruby
